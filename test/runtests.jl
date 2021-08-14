@@ -41,7 +41,7 @@ using Test
         end
       end
     end
-
+    @test HostCPUFeatures.pick_vector_width(Float16) === HostCPUFeatures.pick_vector_width(Float32)
     # @test HostCPUFeatures.nextpow2(0) == 1
     @test all(i -> HostCPUFeatures.nextpow2(i) == i, 0:2)
     for j in 1:10
@@ -49,6 +49,9 @@ using Test
       @test all(i -> HostCPUFeatures.nextpow2(i) == u, l:u)
     end
 
+    @test HostCPUFeatures.unwrap(HostCPUFeatures.static(2)) === 2
+    @test HostCPUFeatures.unwrap(HostCPUFeatures.static(1.2)) === 1.2
+    @test HostCPUFeatures.unwrap(HostCPUFeatures.static(:a)) === :a
   end
 
 end
