@@ -20,6 +20,9 @@ end
 smax(a::StaticInt, b::StaticInt) = ifelse(gt(a, b), a, b)
 smin(a::StaticInt, b::StaticInt) = ifelse(lt(a, b), a, b)
 
+_pick_vector_width_float16(::StaticInt{RS}, ::True) where {RS} = StaticInt{RS}() ÷ StaticInt{2}()
+_pick_vector_width_float16(::StaticInt{RS}, ::False) where {RS} = StaticInt{RS}() ÷ StaticInt{4}()
+pick_vector_width(::Type{Float16}) = _pick_vector_width_float16(register_size(Float32), fast_half())
 pick_vector_width(::Type{T}) where {T} = register_size(T) ÷ static_sizeof(T)
 @inline @aggressive_constprop function _pick_vector_width(min_W, max_W, ::Type{T}, ::Type{S}, args::Vararg{Any,K}) where {K,S,T}
     _max_W = smin(max_W, pick_vector_width(T))

@@ -1,7 +1,7 @@
 name = "HostCPUFeatures"
 uuid = "3e5b6fbb-0976-4d2c-9146-d79de83f2fb0"
 authors = ["Chris Elrod <elrodc@gmail.com> and contributors"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 IfElse = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"

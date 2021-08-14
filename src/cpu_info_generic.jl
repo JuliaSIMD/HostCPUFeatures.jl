@@ -8,4 +8,5 @@ has_opmask_registers() = True()
 reset_extra_features!() = nothing
 
 fast_int64_to_double() = True()
+fast_half() = False()
 

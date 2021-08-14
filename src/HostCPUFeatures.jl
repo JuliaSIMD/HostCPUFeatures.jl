@@ -19,6 +19,9 @@ end
 include("pick_vector_width.jl")
 
 unwrap(::Val{S}) where {S} = S
+unwrap(::StaticInt{S}) where {S} = S
+unwrap(::StaticFloat64{S}) where {S} = S
+unwrap(::StaticSymbol{S}) where {S} = S
 
 @noinline function redefine()
   @debug "Defining CPU name."
