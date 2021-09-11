@@ -6,7 +6,7 @@ prevpow2(W::T) where {T<:Base.BitInteger} = (one(T) << (((T(8sizeof(W))) - one(T
 @generated prevpow2(::StaticInt{N}) where {N} = Expr(:call, Expr(:curly, :StaticInt, prevpow2(N)))
 @generated intlog2(::StaticInt{N}) where {N} = Expr(:call, Expr(:curly, :StaticInt, intlog2(N)))
 
-@static if VERSION ≥ v"1.7.0-DEV.421"
+@static if isdefined(Base, Symbol("@constprop"))
   using Base: @constprop
 else
   macro constprop(_, ex); esc(ex); end
