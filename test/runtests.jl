@@ -20,7 +20,6 @@ using Test
     @test @inferred(HostCPUFeatures.pick_vector_width(Float32, Float32)) * HostCPUFeatures.static_sizeof(Float32) === @inferred(HostCPUFeatures.register_size())
     @test @inferred(HostCPUFeatures.pick_vector_width(Float32, Int32)) * HostCPUFeatures.static_sizeof(Float32) === @inferred(HostCPUFeatures.simd_integer_register_size())
 
-    @test all(i ->  HostCPUFeatures.intlog2(1 << i) == i, 0:(Int == Int64 ? 53 : 30))
     FTypes = (Float32, Float64)
     Wv = ntuple(i -> @inferred(HostCPUFeatures.register_size()) >> (i+1), Val(2))
     for (T, N) in zip(FTypes, Wv)
@@ -43,11 +42,6 @@ using Test
     end
     @test HostCPUFeatures.pick_vector_width(Float16) === HostCPUFeatures.pick_vector_width(Float32)
     # @test HostCPUFeatures.nextpow2(0) == 1
-    @test all(i -> HostCPUFeatures.nextpow2(i) == i, 0:2)
-    for j in 1:10
-      l, u = (1<<j)+1, 1<<(j+1)
-      @test all(i -> HostCPUFeatures.nextpow2(i) == u, l:u)
-    end
 
     @test HostCPUFeatures.unwrap(HostCPUFeatures.static(2)) === 2
     @test HostCPUFeatures.unwrap(HostCPUFeatures.static(1.2)) === 1.2

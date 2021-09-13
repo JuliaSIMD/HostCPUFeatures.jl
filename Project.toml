@@ -4,11 +4,13 @@ authors = ["Chris Elrod <elrodc@gmail.com> and contributors"]
 version = "0.1.2"
 
 [deps]
+BitTwiddlingConvenienceFunctions = "62783981-4cbd-42fc-bca8-16325de8dc4b"
 IfElse = "615f187c-cbe4-4ef1-ba3b-2fcf58d6d173"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 Static = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
 
 [compat]
+BitTwiddlingConvenienceFunctions = "0.1"
 IfElse = "0.1"
 Static = "0.2, 0.3"
 julia = "1.4"

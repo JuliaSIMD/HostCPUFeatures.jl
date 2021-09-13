@@ -4,6 +4,8 @@ using Libdl, Static
 using Static: Zero, One, lt, gt
 using IfElse: ifelse
 
+using BitTwiddlingConvenienceFunctions: prevpow2, nextpow2, intlog2
+
 export has_feature, fma_fast, pick_vector_width, pick_vector_width_shift, register_count,
   register_size, simd_integer_register_size
 
