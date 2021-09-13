@@ -1,7 +1,7 @@
 name = "HostCPUFeatures"
 uuid = "3e5b6fbb-0976-4d2c-9146-d79de83f2fb0"
 authors = ["Chris Elrod <elrodc@gmail.com> and contributors"]
-version = "0.1.3"
+version = "0.1.4"
 
 [deps]
 BitTwiddlingConvenienceFunctions = "62783981-4cbd-42fc-bca8-16325de8dc4b"
