@@ -17,7 +17,7 @@ feature_name(ext) = archstr() * ext[2:end]
 process_feature(ext) = (feature_name(ext), first(ext) == '+')
 
 has_feature(_) = False()
-@noinline function set_featue(feature::String, has::Bool)
+@noinline function set_feature(feature::String, has::Bool)
     featqn = QuoteNode(Symbol(feature))
     if has
         @eval has_feature(::Val{$featqn}) = True()
@@ -31,7 +31,7 @@ function set_features!()
     for ext ∈ features
       feature, has = process_feature(ext)
       has && push!(FEATURE_SET, feature)
-      set_featue(feature, has)
+      set_feature(feature, has)
     end
     Libc.free(features_cstring)
 end
@@ -45,7 +45,7 @@ function reset_features!()
         feature, has = process_feature(ext)
         if _has_feature(feature) ≠ has
             @debug "Defining $(has ? "presence" : "absense") of feature $feature."
-            set_featue(feature, has)
+            set_feature(feature, has)
         end
     end
     Libc.free(features_cstring)
