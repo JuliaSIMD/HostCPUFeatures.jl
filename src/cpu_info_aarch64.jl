@@ -9,7 +9,15 @@ end
 
 # TODO: find actually support SVE
 # _dynamic_register_size() = _has_aarch64_sve() ? 16vscale() : 16
-_dynamic_register_size() = 16
+function _dynamic_register_size()
+  _has_aarch64_sve() || return 16
+  llvmargs = get(ENV, "JULIA_LLVM_ARGS", nothing)
+  llvmargs === nothing && return 16
+  m = match(r"--aarch64-sve-vector-bits-min=(\d+)", llvmargs)
+  m === nothing && return 16
+  length(m.captures) == 0 && return 16
+  return max(16, parse(Int, last(m.captures)) ÷ 8)
+end
 
 function _set_sve_vector_width!(bytes = _dynamic_register_size())
     @eval begin
