@@ -28,8 +28,12 @@ end
 
 function set_features!()
     features, features_cstring = feature_string()
+    znver3 = Sys.CPU_NAME === "znver3"
     for ext ∈ features
       feature, has = process_feature(ext)
+      if znver3 && occursin("512", feature)
+        has = false
+      end
       has && push!(FEATURE_SET, feature)
       set_feature(feature, has)
     end
