@@ -65,7 +65,6 @@ function make_generic(target)
     setfeaturetrue(:x86_64_bmi2)
     setfeaturetrue(:x86_64_fma)
     setfeaturetrue(:x86_64_avx)
-    return
   elseif occursin("znver", target) || occursin("lake", target) || occursin("well", target)
     # no avx512, but avx2, fma, and bmi2
     # znver tries to capture all zen < 4
@@ -80,7 +79,6 @@ function make_generic(target)
     setfeaturetrue(:x86_64_bmi2)
     setfeaturetrue(:x86_64_fma)
     setfeaturetrue(:x86_64_avx)
-    return
   elseif occursin("ivybridge", target) || occursin("sandybridge", target)
     # has avx, and that is about it we care about
     setfeaturefalse(:x86_64_avx512ifma)
@@ -105,5 +103,6 @@ function make_generic(target)
     setfeaturefalse(:x86_64_fma)
     setfeaturefalse(:x86_64_avx)
   end
+  return nothing
 end
 
