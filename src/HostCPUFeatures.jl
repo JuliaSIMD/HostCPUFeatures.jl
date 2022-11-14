@@ -10,7 +10,7 @@ export has_feature, fma_fast, pick_vector_width, pick_vector_width_shift, regist
   register_size, simd_integer_register_size
 
 function get_cpu_name()::String
-  if (@isdefined(Sys.CPU_NAME))
+  if isdefined(Sys, :CPU_NAME)
     Sys.CPU_NAME
   else
     ccall(:jl_get_cpu_name, Ref{String}, ())
