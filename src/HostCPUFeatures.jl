@@ -40,6 +40,10 @@ unwrap(::StaticSymbol{S}) where {S} = S
 end
 const BASELINE_CPU_NAME = get_cpu_name()
 function __init__()
+  if Sys.ARCH === :x86_64
+    target = Base.unsafe_string(Base.JLOptions().cpu_target)
+    occursin("native",  target) || return make_generic(target)
+  end
   ccall(:jl_generating_output, Cint, ()) == 1 && return
   BASELINE_CPU_NAME == Sys.CPU_NAME::String || redefine()
   return nothing
