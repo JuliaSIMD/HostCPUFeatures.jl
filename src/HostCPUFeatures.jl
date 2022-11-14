@@ -9,7 +9,13 @@ using BitTwiddlingConvenienceFunctions: prevpow2, nextpow2, intlog2
 export has_feature, fma_fast, pick_vector_width, pick_vector_width_shift, register_count,
   register_size, simd_integer_register_size
 
-
+function get_cpu_name()::String
+  if (@isdefined(Sys.CPU_NAME))
+    Sys.CPU_NAME
+  else
+    ccall(:jl_get_cpu_name, Ref{String}, ())
+  end
+end
 include("cpu_info.jl")
 if (Sys.ARCH === :x86_64) || (Sys.ARCH === :i686)
     include("cpu_info_x86.jl")
@@ -32,7 +38,7 @@ unwrap(::StaticSymbol{S}) where {S} = S
   reset_features!()
   reset_extra_features!()
 end
-const BASELINE_CPU_NAME = (Sys.CPU_NAME)::String
+const BASELINE_CPU_NAME = get_cpu_name()
 function __init__()
   ccall(:jl_generating_output, Cint, ()) == 1 && return
   BASELINE_CPU_NAME == Sys.CPU_NAME::String || redefine()

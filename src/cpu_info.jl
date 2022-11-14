@@ -27,17 +27,17 @@ has_feature(_) = False()
 end
 
 function set_features!()
-    features, features_cstring = feature_string()
-    znver3 = Sys.CPU_NAME === "znver3"
-    for ext ∈ features
-      feature, has = process_feature(ext)
-      if znver3 && occursin("512", feature)
-        has = false
-      end
-      has && push!(FEATURE_SET, feature)
-      set_feature(feature, has)
+  features, features_cstring = feature_string()
+  znver3 = get_cpu_name() === "znver3"
+  for ext ∈ features
+    feature, has = process_feature(ext)
+    if znver3 && occursin("512", feature)
+      has = false
     end
-    Libc.free(features_cstring)
+    has && push!(FEATURE_SET, feature)
+    set_feature(feature, has)
+  end
+  Libc.free(features_cstring)
 end
 set_features!()
 
@@ -59,7 +59,7 @@ register_size(::Type{T}) where {T} = register_size()
 register_size(::Type{T}) where {T<:Union{Signed,Unsigned}} = simd_integer_register_size()
 
 function define_cpu_name()
-    cpu = QuoteNode(Symbol(Sys.CPU_NAME::String))
+    cpu = QuoteNode(Symbol(get_cpu_name()))
     @eval cpu_name() = Val{$cpu}()
 end
 define_cpu_name()
