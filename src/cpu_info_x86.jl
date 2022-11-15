@@ -43,7 +43,7 @@ end
 end
 
 function make_generic(target)
-  if occursin("tigerlake", target) || occursin("znver4", target)
+  if occursin("tigerlake", target) || occursin("znver4", target) || occursin("sapphirerapids", target)
     # most feature-complete architectures we use
     setfeaturetrue(:x86_64_avx512ifma)
     setfeaturetrue(:x86_64_avx512vl)
