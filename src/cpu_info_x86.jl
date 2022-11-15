@@ -33,12 +33,12 @@ fast_half() = False()
 
 @noinline function setfeaturefalse(s)
   if has_feature(Val(s)) === True()
-    @eval has_feature(::Val{:x86_64_avx512ifma}) = False()
+    @eval has_feature(::Val{$(QuoteNode(s))}) = False()
   end
 end
 @noinline function setfeaturetrue(s)
   if has_feature(Val(s)) === False()
-    @eval has_feature(::Val{:x86_64_avx512ifma}) = True()
+    @eval has_feature(::Val{$(QuoteNode(s))}) = True()
   end
 end
 
