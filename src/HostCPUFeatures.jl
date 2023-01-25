@@ -1,4 +1,8 @@
 module HostCPUFeatures
+if isdefined(Base, :Experimental) &&
+   isdefined(Base.Experimental, Symbol("@max_methods"))
+    @eval Base.Experimental.@max_methods 1
+end
 
 using Libdl, Static
 using Static: Zero, One, lt, gt
