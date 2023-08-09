@@ -9,15 +9,16 @@ register_size() = ifelse(
         StaticInt{16}()
     )
 )
-simd_integer_register_size() = ifelse(
-    has_feature(Val(:x86_64_avx2)),
-    register_size(),
-    ifelse(
-        has_feature(Val(:x86_64_sse2)),
-        StaticInt{16}(),
-        StaticInt{8}()
-    )
-)
+const simd_integer_register_size = register_size
+# simd_integer_register_size() = ifelse(
+#     has_feature(Val(:x86_64_avx2)),
+#     register_size(),
+#     ifelse(
+#         has_feature(Val(:x86_64_sse2)),
+#         StaticInt{16}(),
+#         StaticInt{8}()
+#     )
+# )
 if Sys.ARCH === :i686
     register_count() = StaticInt{8}()
 elseif Sys.ARCH === :x86_64
