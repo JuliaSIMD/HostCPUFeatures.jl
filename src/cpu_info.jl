@@ -1,5 +1,5 @@
 function feature_string()
-    llvmlib_path = VERSION ≥ v"1.6.0-DEV.1429" ? Base.libllvm_path() : only(filter(lib->occursin(r"LLVM\b", basename(lib)), Libdl.dllist()))
+    llvmlib_path = VERSION ≥ v"1.6.0-DEV.1429" ? Base.libllvm_path() : only(filter(lib -> occursin(r"LLVM\b", basename(lib)), Libdl.dllist()))
     libllvm = Libdl.dlopen(llvmlib_path)
     gethostcpufeatures = Libdl.dlsym(libllvm, :LLVMGetHostCPUFeatures)
     features_cstring = ccall(gethostcpufeatures, Cstring, ())
@@ -16,36 +16,35 @@ archstr() = Sys.ARCH === :i686 ? "x86_64_" : string(Sys.ARCH) * '_'
 feature_name(ext) = archstr() * ext[2:end]
 process_feature(ext) = (feature_name(ext), first(ext) == '+')
 
-has_feature(_) = False()
-@noinline function set_feature(feature::String, has::Bool)
-    featqn = QuoteNode(Symbol(feature))
-    if has
-        @eval has_feature(::Val{$featqn}) = True()
-    else
-        @eval has_feature(::Val{$featqn}) = False()
-    end
-end
+# has_feature(_) = False()
+# @noinline function set_feature(feature::String, has::Bool)
+#     featqn = QuoteNode(Symbol(feature))
+#     if has
+#         @eval has_feature(::Val{$featqn}) = True()
+#     else
+#         @eval has_feature(::Val{$featqn}) = False()
+#     end
+# end
 
 function set_features!()
-  features, features_cstring = feature_string()
-  znver3 = get_cpu_name() === "znver3"
-  for ext ∈ features
-    feature, has = process_feature(ext)
-    if znver3 && occursin("512", feature)
-      has = false
+    features, features_cstring = feature_string()
+    znver3 = get_cpu_name() === "znver3"
+    for ext in features
+        feature, has = process_feature(ext)
+        if znver3 && occursin("512", feature)
+            has = false
+        end
+        has && push!(FEATURE_SET, feature)
+        set_feature(feature, has)
     end
-    has && push!(FEATURE_SET, feature)
-    set_feature(feature, has)
-  end
-  Libc.free(features_cstring)
+    Libc.free(features_cstring)
 end
-set_features!()
-
+# set_features!()
 
 
 function reset_features!()
     features, features_cstring = feature_string()
-    for ext ∈ features
+    for ext in features
         feature, has = process_feature(ext)
         if _has_feature(feature) ≠ has
             @debug "Defining $(has ? "presence" : "absense") of feature $feature."
@@ -56,7 +55,7 @@ function reset_features!()
 end
 
 register_size(::Type{T}) where {T} = register_size()
-register_size(::Type{T}) where {T<:Union{Signed,Unsigned}} = simd_integer_register_size()
+register_size(::Type{T}) where {T <: Union{Signed, Unsigned}} = simd_integer_register_size()
 
 function define_cpu_name()
     cpu = QuoteNode(Symbol(get_cpu_name()))
