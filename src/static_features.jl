@@ -1,6 +1,6 @@
 has_feature(::Val{S}) where {S} = has_feature(S)
 
-@generated function has_feature(my_feature::Symbol)
+@inline @generated function has_feature(my_feature::Symbol)
 
     features, features_cstring = feature_string()
 
