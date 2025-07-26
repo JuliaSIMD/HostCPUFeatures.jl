@@ -1,12 +1,8 @@
 fma_fast() = has_feature(Val(:x86_64_fma)) | has_feature(Val(:x86_64_fma4))
 register_size() = ifelse(
-    has_feature(Val(:x86_64_avx512f)),
-    StaticInt{64}(),
-    ifelse(
-        has_feature(Val(:x86_64_avx)),
-        StaticInt{32}(),
-        StaticInt{16}()
-    )
+  has_feature(Val(:x86_64_avx512f)),
+  StaticInt{64}(),
+  ifelse(has_feature(Val(:x86_64_avx)), StaticInt{32}(), StaticInt{16}()),
 )
 const simd_integer_register_size = register_size
 # simd_integer_register_size() = ifelse(
@@ -19,9 +15,10 @@ const simd_integer_register_size = register_size
 #     )
 # )
 if Sys.ARCH === :i686
-    register_count() = StaticInt{8}()
+  register_count() = StaticInt{8}()
 elseif Sys.ARCH === :x86_64
-    register_count() = ifelse(has_feature(Val(:x86_64_avx512f)), StaticInt{32}(), StaticInt{16}())
+  register_count() =
+    ifelse(has_feature(Val(:x86_64_avx512f)), StaticInt{32}(), StaticInt{16}())
 end
 has_opmask_registers() = has_feature(Val(:x86_64_avx512f))
 
@@ -32,14 +29,14 @@ fast_int64_to_double() = has_feature(Val(:x86_64_avx512dq))
 fast_half() = False()
 
 @noinline function setfeaturefalse(s)
-    if has_feature(Val(s)) === True()
-        @eval has_feature(::Val{$(QuoteNode(s))}) = False()
-    end
+  if has_feature(Val(s)) === True()
+    @eval has_feature(::Val{$(QuoteNode(s))}) = False()
+  end
 end
 @noinline function setfeaturetrue(s)
-    if has_feature(Val(s)) === False()
-        @eval has_feature(::Val{$(QuoteNode(s))}) = True()
-    end
+  if has_feature(Val(s)) === False()
+    @eval has_feature(::Val{$(QuoteNode(s))}) = True()
+  end
 end
 
 # function make_generic(target)
