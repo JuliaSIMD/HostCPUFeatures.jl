@@ -7,6 +7,7 @@ end
 using Libdl, Static
 using Static: Zero, One, lt, gt
 using IfElse: ifelse
+using Preferences
 
 using BitTwiddlingConvenienceFunctions: prevpow2, nextpow2, intlog2
 
@@ -37,19 +38,26 @@ unwrap(::StaticSymbol{S}) where {S} = S
 
 @noinline function redefine()
   @debug "Defining CPU name."
-  define_cpu_name()
+  redefine_cpu_name()
 
   reset_features!()
   reset_extra_features!()
 end
 const BASELINE_CPU_NAME = get_cpu_name()
+const allow_eval = @load_preference("allow_runtime_invalidation", false)
+
 function __init__()
   ccall(:jl_generating_output, Cint, ()) == 1 && return
   if Sys.ARCH === :x86_64 || Sys.ARCH === :i686
     target = Base.unsafe_string(Base.JLOptions().cpu_target)
-    occursin("native",  target) || return make_generic(target)
+    if !occursin("native",  target)
+      make_generic(target)
+      return nothing
+    end
   end
-  BASELINE_CPU_NAME == Sys.CPU_NAME::String || redefine()
+  if BASELINE_CPU_NAME != Sys.CPU_NAME::String
+    redefine()
+  end
   return nothing
 end
 

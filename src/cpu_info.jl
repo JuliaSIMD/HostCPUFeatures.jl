@@ -48,8 +48,12 @@ function reset_features!()
     for ext ∈ features
         feature, has = process_feature(ext)
         if _has_feature(feature) ≠ has
-            @debug "Defining $(has ? "presence" : "absense") of feature $feature."
-            set_feature(feature, has)
+            if allow_eval
+                @debug "Defining $(has ? "presence" : "absense") of feature $feature."
+                set_feature(feature, has)
+            else
+                @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU feature flag: $ext."
+            end
         end
     end
     Libc.free(features_cstring)
@@ -58,8 +62,13 @@ end
 register_size(::Type{T}) where {T} = register_size()
 register_size(::Type{T}) where {T<:Union{Signed,Unsigned}} = simd_integer_register_size()
 
-function define_cpu_name()
+function redefine_cpu_name()
     cpu = QuoteNode(Symbol(get_cpu_name()))
-    @eval cpu_name() = Val{$cpu}()
+    if allow_eval
+      @eval cpu_name() = Val{$cpu}()
+    else
+      @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU name (from build time)."
+    end
 end
-define_cpu_name()
+cpu = QuoteNode(Symbol(get_cpu_name()))
+@eval cpu_name() = Val{$cpu}()
