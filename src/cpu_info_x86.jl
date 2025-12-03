@@ -51,7 +51,7 @@ end
   end
 end
 
-function make_generic(target)
+function make_generic_x86(target)
   if occursin("tigerlake", target) || occursin("znver4", target) || occursin("sapphirerapids", target)
     # most feature-complete architectures we use
     setfeaturetrue(:x86_64_avx512ifma)

@@ -28,7 +28,7 @@ function _set_sve_vector_width!(bytes = _dynamic_register_size())
 end
 
 
-if _has_aarch64_sve()# && !(Bool(has_feature(Val(:aarch64_sve))))
+if build_cpu_target == "native" && _has_aarch64_sve()# && !(Bool(has_feature(Val(:aarch64_sve))))
     has_feature(::Val{:aarch64_sve_cpuid}) = True()
     _set_sve_vector_width!()
 else

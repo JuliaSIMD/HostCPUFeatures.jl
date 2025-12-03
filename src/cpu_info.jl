@@ -39,9 +39,10 @@ function set_features!()
   end
   Libc.free(features_cstring)
 end
-set_features!()
 
-
+if build_cpu_target == "native"
+    set_features!()
+end
 
 function reset_features!()
     features, features_cstring = feature_string()
@@ -70,5 +71,8 @@ function redefine_cpu_name()
       @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU name (from build time)."
     end
 end
-cpu = QuoteNode(Symbol(get_cpu_name()))
-@eval cpu_name() = Val{$cpu}()
+
+let _cpu = QuoteNode(Symbol(build_cpu_target == "native" ?
+			    get_cpu_name() : build_cpu_target))
+   @eval cpu_name() = Val{$_cpu}()
+end
