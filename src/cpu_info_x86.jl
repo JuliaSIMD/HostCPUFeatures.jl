@@ -32,18 +32,26 @@ fast_int64_to_double() = has_feature(Val(:x86_64_avx512dq))
 
 fast_half() = False()
 
-@noinline function setfeaturefalse(s)
+@inline function setfeaturefalse(s)
   if has_feature(Val(s)) === True()
-    @eval has_feature(::Val{$(QuoteNode(s))}) = False()
+    if allow_eval
+      @eval has_feature(::Val{$(QuoteNode(s))}) = False()
+    else
+      @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU feature flag: $s."
+    end
   end
 end
-@noinline function setfeaturetrue(s)
+@inline function setfeaturetrue(s)
   if has_feature(Val(s)) === False()
-    @eval has_feature(::Val{$(QuoteNode(s))}) = True()
+    if allow_eval
+      @eval has_feature(::Val{$(QuoteNode(s))}) = True()
+    else
+      @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU feature flag: $s."
+    end
   end
 end
 
-function make_generic(target)
+function make_generic_x86(target)
   if occursin("tigerlake", target) || occursin("znver4", target) || occursin("sapphirerapids", target)
     # most feature-complete architectures we use
     setfeaturetrue(:x86_64_avx512ifma)

@@ -28,7 +28,7 @@ function _set_sve_vector_width!(bytes = _dynamic_register_size())
 end
 
 
-if _has_aarch64_sve()# && !(Bool(has_feature(Val(:aarch64_sve))))
+if build_cpu_target == "native" && _has_aarch64_sve()# && !(Bool(has_feature(Val(:aarch64_sve))))
     has_feature(::Val{:aarch64_sve_cpuid}) = True()
     _set_sve_vector_width!()
 else
@@ -39,10 +39,20 @@ end
 
 function reset_extra_features!()
     drs = _dynamic_register_size()
-    register_size() ≠ drs && _set_sve_vector_width!(drs)
+    if register_size() ≠ drs
+        if allow_eval
+            _set_sve_vector_width!(drs)
+        else
+            @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU register size."
+        end
+    end
     hassve = _has_aarch64_sve()
     if hassve ≠ has_feature(Val(:aarch64_sve_cpuid))
-        @eval has_feature(::Val{:aarch64_sve_cpuid}) = $(Expr(:call, hassve ? :True : :False))
+        if allow_eval
+            @eval has_feature(::Val{:aarch64_sve_cpuid}) = $(Expr(:call, hassve ? :True : :False))
+        else
+            @warn "Runtime invalidation was disabled, but the CPU info is out-of-date.\nWill continue with incorrect CPU feature flag: :aarch64_sve_cpuid."
+        end
     end
 end
 
