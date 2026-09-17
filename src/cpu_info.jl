@@ -26,21 +26,32 @@ has_feature(_) = False()
     end
 end
 
-function set_features!()
+function host_features()
   features, features_cstring = feature_string()
   znver3 = get_cpu_name() === "znver3"
+  s = Set{Symbol}()
   for ext ∈ features
     feature, has = process_feature(ext)
     if znver3 && occursin("512", feature)
       has = false
     end
-    has && push!(FEATURE_SET, feature)
-    set_feature(feature, has)
+    has && push!(s, Symbol(feature))
   end
   Libc.free(features_cstring)
+  return s
 end
 
-if build_cpu_target == "native"
+function set_features!()
+  for feature ∈ host_features()
+    f = string(feature)
+    push!(FEATURE_SET, f)
+    set_feature(f, true)
+  end
+end
+# x86 always enables host features here and then intersects them with the
+# `cpu_target` specs in `make_generic`; other architectures keep the previous
+# all-false default for non-native targets.
+if build_cpu_target == "native" || Sys.ARCH === :x86_64 || Sys.ARCH === :i686
     set_features!()
 end
 

@@ -23,7 +23,8 @@ end
 const build_cpu_target = if occursin("native", _cpu_target)
   "native" # 'native' takes priority if provided
 else
-  split(_cpu_target, ";")[1]
+  # first `;`-separated spec, without any `,+feature`/`-feature` modifiers
+  first(split(first(split(_cpu_target, ';')), ','))
 end
 
 # If true, this will opt-in to "freeze" an under-approximation of the CPU features at precompile-
@@ -65,17 +66,20 @@ end
 const BASELINE_CPU_NAME = get_cpu_name()
 const allow_eval = @load_preference("allow_runtime_invalidation", false)
 
-function make_generic(target)
+function make_generic(target; runtime::Bool = false)
   target == "native" && return false
   if Sys.ARCH === :x86_64 || Sys.ARCH === :i686
-    make_generic_x86(target)
+    make_generic_x86(target; runtime)
     return true
   else
     return false
   end
 end
 
-make_generic(build_cpu_target)
+# Restrict reported features to those available in every `cpu_target` spec and
+# on the host, so generated code can be instruction-selected for every clone of
+# a multiversioned image and still run in this session.
+make_generic(_cpu_target)
 
 function __init__()
   ccall(:jl_generating_output, Cint, ()) == 1 && return
@@ -87,7 +91,7 @@ function __init__()
     #
     # Fixing this discepancy will invalidate the whole world (so it should probably
     # throw an error), but we do it anyway for backwards-compatibility.
-    if make_generic(runtime_target)
+    if make_generic(runtime_target; runtime = true)
       return nothing
     end
   end
