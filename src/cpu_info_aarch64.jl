@@ -1,10 +1,14 @@
 
 _has_aarch64_sve() = (Base.libllvm_version ≥ v"11") && (Base.BinaryPlatforms.CPUID.test_cpu_feature(Base.BinaryPlatforms.CPUID.JL_AArch64_sve))
 
-if Int === Int64
-    @noinline vscale() = ccall("llvm.vscale.i64", llvmcall, Int64, ())
-else
-    @noinline vscale() = ccall("llvm.vscale.i32", llvmcall, Int32, ())
+# Only with SVE: LLVM can't lower `llvm.vscale` for a CPU without it, and a sysimage build compiles `vscale()` even
+# though nothing calls it, failing with "LLVM ERROR: Cannot select: ... vscale" (e.g. on Apple Silicon). See #29
+if _has_aarch64_sve()
+    if Int === Int64
+        @noinline vscale() = ccall("llvm.vscale.i64", llvmcall, Int64, ())
+    else
+        @noinline vscale() = ccall("llvm.vscale.i32", llvmcall, Int32, ())
+    end
 end
 
 # TODO: find actually support SVE
